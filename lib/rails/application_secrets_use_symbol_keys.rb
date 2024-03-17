@@ -25,7 +25,10 @@ Synvert::Rewriter.new 'rails', 'application_secrets_use_symbol_keys' do
     # Rails.appplication.config.secrets[:smtp_settings]["address"]
     # =>
     # Rails.appplication.config.secrets[:smtp_settings][:address]
-    with_node node_type: 'send', receiver: /^Rails.application.config.secrets/, message: '[]', arguments: { first: { node_type: 'str' } } do
+    with_node node_type: 'send',
+              receiver: /^Rails.application.config.secrets/,
+              message: '[]',
+              arguments: { first: { node_type: 'str' } } do
       replace 'arguments.first', with: '{{arguments.first.to_symbol}}'
     end
   end

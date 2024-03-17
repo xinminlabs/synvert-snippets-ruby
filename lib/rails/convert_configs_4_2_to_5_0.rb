@@ -55,7 +55,10 @@ Synvert::Rewriter.new 'rails', 'convert_configs_4_2_to_5_0' do
                 name: 'middleware'
               },
               name: 'use',
-              arguments: { node_type: 'arguments_node', arguments: { size: { gt: 0 }, first: { node_type: 'string_node' } } } do
+              arguments: {
+                node_type: 'arguments_node',
+                arguments: { size: { gt: 0 }, first: { node_type: 'string_node' } }
+              } do
       replace 'arguments.arguments.first', with: "{{arguments.arguments.first.to_value}}"
     end
   end

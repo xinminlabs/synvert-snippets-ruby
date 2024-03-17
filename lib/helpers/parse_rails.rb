@@ -7,7 +7,7 @@ Synvert::Helper.new 'rails/parse' do |options|
   with_configurations(number_of_workers: 1) do
     tables = {}
     within_file 'db/schema.rb' do
-      within_node node_type: 'call_node', name: 'create_table'  do
+      within_node node_type: 'call_node', name: 'create_table' do
         table_name = node.arguments.arguments.first.to_value
         tables[table_name] = { columns: [], indices: [] }
         with_node node_type: 'call_node', receiver: 't', message: { not: 'index' } do

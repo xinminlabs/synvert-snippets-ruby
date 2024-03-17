@@ -28,7 +28,21 @@ Synvert::Rewriter.new 'ruby', 'use_keyword_arguments' do
     with_node node_type: 'call_node',
               receiver: 'CSV',
               name: 'generate',
-              arguments: { node_type: 'arguments_node', arguments: { size: 1, '0': { node_type: { in: %w[local_variable_read_node instance_variable_read_node call_node] } } } } do
+              arguments: {
+                node_type: 'arguments_node',
+                arguments: {
+                  size: 1,
+                  '0': {
+                    node_type: {
+                      in: %w[
+                        local_variable_read_node
+                        instance_variable_read_node
+                        call_node
+                      ]
+                    }
+                  }
+                }
+              } do
       insert '**', to: 'arguments.arguments.0', at: 'beginning'
     end
   end

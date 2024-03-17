@@ -29,7 +29,11 @@ Synvert::Rewriter.new 'rails', 'convert_dynamic_finders_for_rails_3' do
 
   call_helper 'rails/parse'
   rails_tables = load_data :rails_tables
-  table_columns = rails_tables.present? ? rails_tables.values.flat_map { |value| value[:columns] }.map { |column| column[:name] } + ['id'] : []
+  table_columns =
+    rails_tables.present? ? rails_tables.values.flat_map { |value|
+                              value[:columns]
+                            }
+   .map { |column| column[:name] } + ['id'] : []
 
   helper_method :dynamic_finder_to_hash do |prefix|
     fields = node.message.to_s[prefix.length..-1].split('_and_')
