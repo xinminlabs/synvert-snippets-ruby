@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-Synvert::Helper.new 'rails/parse' do |options|
+Synvert::Helper.new 'rails/parse' do |_options|
   configure(parser: Synvert::PRISM_PARSER)
 
   # Set number_of_workers to 1 to skip parallel.
