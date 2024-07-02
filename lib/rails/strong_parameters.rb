@@ -65,7 +65,10 @@ Synvert::Rewriter.new 'rails', 'strong_parameters' do
   within_files Synvert::RAILS_MODEL_FILES do
     within_node node_type: 'class_node' do
       object_name = node.name.to_s.underscore
-      table_columns = rails_tables.present? ? rails_tables[object_name.tableize][:columns].map { |column| column[:name] } - default_columns : []
+      table_columns =
+        rails_tables.present? ? rails_tables[object_name.tableize][:columns].map { |column|
+                                  column[:name]
+                                } - default_columns : []
 
       # assign and remove attr_accessible ...
       with_node node_type: 'call_node', name: 'attr_accessible' do
@@ -75,17 +78,21 @@ Synvert::Rewriter.new 'rails', 'strong_parameters' do
 
       # assign and remove attr_protected ...
       with_node node_type: 'call_node', name: 'attr_protected' do
-        parameters[object_name] = table_columns.map { |column| ":#{column}" } - node.arguments.arguments.map(&:to_source)
+        parameters[object_name] = table_columns.map { |column|
+          ":#{column}"
+        } - node.arguments.arguments.map(&:to_source)
         remove
       end
     end
   end
 
-
   within_file Synvert::RAILS_CONTROLLER_FILES do
     within_node node_type: 'class_node' do
       object_name = node.name.to_s.sub('Controller', '').singularize.underscore
-      if_exist_node node_type: 'call_node', receiver: 'params', name: '[]', arguments: { node_type: 'arguments_node', arguments: [object_name.to_sym] } do
+      if_exist_node node_type: 'call_node',
+                    receiver: 'params',
+                    name: '[]',
+                    arguments: { node_type: 'arguments_node', arguments: [object_name.to_sym] } do
         if parameters[object_name]
           # append def xxx_params; ...; end
           permit_params = parameters[object_name].join(', ')

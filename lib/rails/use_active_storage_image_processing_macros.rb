@@ -24,7 +24,15 @@ Synvert::Rewriter.new 'rails', 'use_active_storage_image_processing_macros' do
   if_gem 'activestorage', '>= 6.1'
 
   within_files Synvert::ALL_RUBY_FILES + Synvert::ALL_RAKE_FILES do
-    with_node node_type: 'call_node', name: 'preview', arguments: { node_type: 'arguments_node', arguments: { size: 1, first: { node_type: 'keyword_hash_node', resize_value: { not: nil } } } } do
+    with_node node_type: 'call_node',
+              name: 'preview',
+              arguments: {
+                node_type: 'arguments_node',
+                arguments: {
+                  size: 1,
+                  first: { node_type: 'keyword_hash_node', resize_value: { not: nil } }
+                }
+              } do
       resize_value = node.arguments.arguments.first.resize_value.to_value
       width, height = resize_value.split('x')
       if resize_value.ends_with?('>')

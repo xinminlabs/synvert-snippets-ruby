@@ -60,7 +60,10 @@ Synvert::Rewriter.new 'rails', 'migrate-ujs-to-turbo' do
                 }
               } do
       delete 'arguments.arguments.-1.method_element', and_comma: true
-      insert 'data: { turbo_method: {{arguments.arguments.-1.method_source}} }', to: 'arguments.arguments.-1', at: 'end', and_comma: true
+      insert 'data: { turbo_method: {{arguments.arguments.-1.method_source}} }',
+             to: 'arguments.arguments.-1',
+             at: 'end',
+             and_comma: true
     end
 
     # submit_tag "Create", data: { disable_with: "Submitting..." }
@@ -73,7 +76,10 @@ Synvert::Rewriter.new 'rails', 'migrate-ujs-to-turbo' do
                 node_type: 'arguments_node',
                 arguments: {
                   size: 2,
-                  last: { node_type: 'keyword_hash_node', data_value: { node_type: 'hash_node', disable_with_value: { not: nil } } }
+                  last: {
+                    node_type: 'keyword_hash_node',
+                    data_value: { node_type: 'hash_node', disable_with_value: { not: nil } }
+                  }
                 }
               } do
       replace "arguments.arguments.1.data_value.disable_with_element.key", with: 'turbo_submits_with:'

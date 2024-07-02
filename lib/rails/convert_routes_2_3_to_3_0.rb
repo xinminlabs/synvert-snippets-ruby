@@ -146,11 +146,15 @@ Synvert::Rewriter.new 'rails', 'convert_routes_2_3_to_3_0' do
   end
 
   helper_method :generate_new_child_routes do |block_node|
-    block_node.body.body.map { |child_node| "  #{child_node.to_source.sub("#{block_node.parameters.parameters.requireds.first.to_source}.", '')}\n" }.join('')
+    block_node.body.body.map { |child_node|
+      "  #{child_node.to_source.sub("#{block_node.parameters.parameters.requireds.first.to_source}.", '')}\n"
+    }
+.join('')
   end
 
   helper_method :reject_keys_from_hash do |hash_node, *keys|
-    hash_node.elements.reject { |element_node| keys.include?(element_node.key.to_value) }.map(&:to_source).join(', ')
+    hash_node.elements.reject { |element_node| keys.include?(element_node.key.to_value) }
+             .map(&:to_source).join(', ')
   end
 
   within_files Synvert::RAILS_ROUTE_FILES do
@@ -161,7 +165,11 @@ Synvert::Rewriter.new 'rails', 'convert_routes_2_3_to_3_0' do
     # namespace :admin do
     #   resources :users
     # end
-    with_node node_type: 'call_node', receiver: { not: nil }, name: 'namespace', block: { node_type: 'block_node' }, arguments: { not: nil } do
+    with_node node_type: 'call_node',
+              receiver: { not: nil },
+              name: 'namespace',
+              block: { node_type: 'block_node' },
+              arguments: { not: nil } do
       new_routes = []
       new_routes << "namespace {{arguments}} do\n"
       new_routes << generate_new_child_routes(node.block)
@@ -217,7 +225,10 @@ Synvert::Rewriter.new 'rails', 'convert_routes_2_3_to_3_0' do
     within_node node_type: 'call_node',
                 receiver: { not: nil },
                 name: { in: ['resource', 'resources'] },
-                arguments: { node_type: 'arguments_node', arguments: { size: 2, last: { node_type: 'keyword_hash_node' } } } do
+                arguments: {
+                  node_type: 'arguments_node',
+                  arguments: { size: 2, last: { node_type: 'keyword_hash_node' } }
+                } do
       hash_argument = node.arguments.arguments.last
       new_routes = []
       if !hash_argument.collection_value.nil? || !hash_argument.member_value.nil?
@@ -244,7 +255,16 @@ Synvert::Rewriter.new 'rails', 'convert_routes_2_3_to_3_0' do
     within_node node_type: 'call_node',
                 receiver: 'map',
                 name: 'connect',
-                arguments: { node_type: 'arguments_node', arguments: { last: { node_type: 'keyword_hash_node', action_value: { not: nil }, controller_value: { not: nil } } } } do
+                arguments: {
+                  node_type: 'arguments_node',
+                  arguments: {
+                    last: {
+                      node_type: 'keyword_hash_node',
+                      action_value: { not: nil },
+                      controller_value: { not: nil }
+                    }
+                  }
+                } do
       hash_node = node.arguments.arguments.last
       controller_action_name = extract_controller_action_name(hash_node)
       method = hash_node.method_value ? hash_node.method_value.to_value : 'match'
@@ -283,7 +303,14 @@ Synvert::Rewriter.new 'rails', 'convert_routes_2_3_to_3_0' do
     with_node node_type: 'call_node',
               receiver: 'map',
               name: 'connect',
-              arguments: { node_type: 'arguments_node', arguments: { size: 2, first: %r|(.*?)/:action/:id|, last: { node_type: 'keyword_hash_node', controller_value: { not: nil } } } } do
+              arguments: {
+                node_type: 'arguments_node',
+                arguments: {
+                  size: 2,
+                  first: %r|(.*?)/:action/:id|,
+                  last: { node_type: 'keyword_hash_node', controller_value: { not: nil } }
+                }
+              } do
       controller_name = node.arguments.arguments.last.controller_value.to_value
       replace_with "match #{wrap_with_quotes(controller_name + "(/:action(/:id))(.:format)")}, {{arguments.arguments.last}}"
     end
@@ -293,7 +320,14 @@ Synvert::Rewriter.new 'rails', 'convert_routes_2_3_to_3_0' do
     with_node node_type: 'call_node',
               receiver: 'map',
               name: 'connect',
-              arguments: { node_type: 'arguments_node', arguments: { size: 2, first: %r|(.*?)/:action['"]$|, last: { node_type: 'keyword_hash_node', controller_value: { not: nil } } } } do
+              arguments: {
+                node_type: 'arguments_node',
+                arguments: {
+                  size: 2,
+                  first: %r|(.*?)/:action['"]$|,
+                  last: { node_type: 'keyword_hash_node', controller_value: { not: nil } }
+                }
+              } do
       controller_name = node.arguments.arguments.last.controller_value.to_value
       replace_with "match #{wrap_with_quotes(controller_name + "(/:action)(.:format)")}, {{arguments.arguments.last}}"
     end
@@ -304,7 +338,13 @@ Synvert::Rewriter.new 'rails', 'convert_routes_2_3_to_3_0' do
     within_node node_type: 'call_node',
                 receiver: 'map',
                 name: { not_in: ['root', 'connect', 'resource', 'resources'] },
-                arguments: { node_type: 'arguments_node', arguments: { size: 2, last: { node_type: 'keyword_hash_node', controller_value: { not: nil } } } } do
+                arguments: {
+                  node_type: 'arguments_node',
+                  arguments: {
+                    size: 2,
+                    last: { node_type: 'keyword_hash_node', controller_value: { not: nil } }
+                  }
+                } do
       url = node.arguments.arguments.first.to_value
       hash_node = node.arguments.arguments.last
       if hash_node.action_value || url !~ /:action/

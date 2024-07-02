@@ -33,7 +33,10 @@ Synvert::Rewriter.new 'rails', 'convert_models_3_2_to_4_0' do
     within_node node_type: 'call_node',
                 receiver: nil,
                 name: { in: ['has_one', 'has_many'] },
-                arguments: { node_type: 'arguments_node', arguments: { last: { node_type: 'keyword_hash_node', dependent_value: :restrict } } } do
+                arguments: {
+                  node_type: 'arguments_node',
+                  arguments: { last: { node_type: 'keyword_hash_node', dependent_value: :restrict } }
+                } do
       replace 'arguments.arguments.-1.dependent_value', with: ':restrict_with_exception'
     end
   end

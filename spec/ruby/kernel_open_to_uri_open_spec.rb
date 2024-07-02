@@ -13,13 +13,13 @@ RSpec.describe 'Ruby converts Kernel#open to URI.open' do
 
   context 'not convert when define open method' do
     let(:rewriter_name) { 'ruby/kernel_open_to_uri_open' }
-    let(:test_content) {<<~EOS}
+    let(:test_content) { <<~EOS }
       def open(url)
       end
 
       open('http://test.com')
     EOS
-    let(:test_rewritten_content) {<<~EOS}
+    let(:test_rewritten_content) { <<~EOS }
       def open(url)
       end
 

@@ -38,7 +38,10 @@ Synvert::Rewriter.new 'rails', 'convert_rails_root' do
     # File.join(Rails.root, 'config/database.yml')
     # =>
     # Rails.root.join('config/database.yml')
-    with_node node_type: 'call_node', receiver: 'File', name: 'join', arguments: { node_type: 'arguments_node', arguments: { first: 'Rails.root' } } do
+    with_node node_type: 'call_node',
+              receiver: 'File',
+              name: 'join',
+              arguments: { node_type: 'arguments_node', arguments: { first: 'Rails.root' } } do
       other_arguments = node.arguments.arguments[1..-1].map(&:to_source).join(', ')
       replace_with "Rails.root.join(#{other_arguments})"
     end
@@ -56,7 +59,12 @@ Synvert::Rewriter.new 'rails', 'convert_rails_root' do
     # =>
     # Rails.root.join('config/database.yml')
     with_node node_type: 'interpolated_string_node',
-              parts: { first: { node_type: 'embedded_statements_node', statements: { body: { first: 'Rails.root' } } } } do
+              parts: {
+                first: {
+                  node_type: 'embedded_statements_node',
+                  statements: { body: { first: 'Rails.root' } }
+                }
+              } do
       source = node.to_source
       source[1..14] = ''
       replace_with "Rails.root.join(#{source})"

@@ -41,7 +41,13 @@ Synvert::Rewriter.new 'rails', 'convert_after_commit' do
     with_node node_type: 'call_node',
               receiver: nil,
               name: 'after_commit',
-              arguments: { node_type: 'arguments_node', arguments: { size: 2, '1': { node_type: 'keyword_hash_node', on_value: { in: %i[create update destroy] } } } } do
+              arguments: {
+                node_type: 'arguments_node',
+                arguments: {
+                  size: 2,
+                  '1': { node_type: 'keyword_hash_node', on_value: { in: %i[create update destroy] } }
+                }
+              } do
       group do
         replace :name, with: 'after_{{arguments.arguments.-1.on_value.to_value}}_commit'
         delete 'arguments.arguments.-1.on_element', and_comma: true
@@ -60,7 +66,13 @@ Synvert::Rewriter.new 'rails', 'convert_after_commit' do
     with_node node_type: 'call_node',
               receiver: nil,
               message: 'after_commit',
-              arguments: { node_type: 'arguments_node', arguments: { size: 2, '1': { node_type: 'keyword_hash_node', on_value: { node_type: 'array_node' } } } } do
+              arguments: {
+                node_type: 'arguments_node',
+                arguments: {
+                  size: 2,
+                  '1': { node_type: 'keyword_hash_node', on_value: { node_type: 'array_node' } }
+                }
+              } do
       group do
         if node.arguments.arguments[1].on_value.elements.size == 1
           replace :message, with: 'after_{{arguments.arguments.-1.on_value.elements.0.to_value}}_commit'

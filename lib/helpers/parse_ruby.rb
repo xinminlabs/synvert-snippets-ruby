@@ -48,7 +48,17 @@ Synvert::Helper.new 'ruby/parse' do |options|
           new_context = existing_module
         else
           full_name = [current_context[:full_name], name].compact.join('::')
-          new_context = { name: name, full_name: full_name, type: "module", modules: [], classes: [], methods: [], static_methods: [], singleton: {}, constants: [] }
+          new_context = {
+            name: name,
+            full_name: full_name,
+            type: "module",
+            modules: [],
+            classes: [],
+            methods: [],
+            static_methods: [],
+            singleton: {},
+            constants: []
+          }
           current_context[:modules] << new_context
         end
 
@@ -69,7 +79,19 @@ Synvert::Helper.new 'ruby/parse' do |options|
           new_context = existing_class
         else
           full_name = [current_context[:full_name], name].compact.join('::')
-          new_context = { name: name, full_name: full_name, type: "class", superclass: superclass, modules: [], classes: [], methods: [], static_methods: [], singleton: {}, constants: [], included_modules: [] }
+          new_context = {
+            name: name,
+            full_name: full_name,
+            type: "class",
+            superclass: superclass,
+            modules: [],
+            classes: [],
+            methods: [],
+            static_methods: [],
+            singleton: {},
+            constants: [],
+            included_modules: []
+          }
           current_context[:classes] << new_context
         end
 
@@ -105,7 +127,10 @@ Synvert::Helper.new 'ruby/parse' do |options|
       end
 
       add_callback :call_node, at: 'start' do |node|
-        if node.receiver.nil? && node.name == :include && current_context[:type] == "class" && !node.arguments.nil? && %i[constant_read_node constant_path_node].include?(node.arguments.arguments.first.type)
+        if node.receiver.nil? && node.name == :include && current_context[:type] == "class" && !node.arguments.nil? && %i[
+          constant_read_node constant_path_node
+        ].include?(node.arguments.arguments.first.type)
+
           current_context[:included_modules] << node.arguments.arguments.first.to_source
         end
       end

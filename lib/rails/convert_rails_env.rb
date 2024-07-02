@@ -42,28 +42,38 @@ Synvert::Rewriter.new 'rails', 'convert_rails_env' do
     # Rails.env == 'test'
     # =>
     # Rails.env.test?
-    with_node node_type: 'call_node', receiver: 'Rails.env', name: '==', arguments: { node_type: 'arguments_node', arguments: { size: 1 } } do
+    with_node node_type: 'call_node',
+              receiver: 'Rails.env',
+              name: '==',
+              arguments: { node_type: 'arguments_node', arguments: { size: 1 } } do
       replace_with "Rails.env.{{arguments.arguments.0.to_value}}?"
     end
 
     # 'development' == Rails.env
     # =>
     # Rails.env.development?
-    with_node node_type: 'call_node', name: '==', arguments: { node_type: 'arguments_node', arguments: { size: 1, first: 'Rails.env' } } do
+    with_node node_type: 'call_node',
+              name: '==',
+              arguments: { node_type: 'arguments_node', arguments: { size: 1, first: 'Rails.env' } } do
       replace_with "Rails.env.{{receiver.to_value}}?"
     end
 
     # Rails.env != 'test'
     # =>
     # !Rails.env.test?
-    with_node node_type: 'call_node', receiver: 'Rails.env', name: '!=', arguments: { node_type: 'arguments_node', arguments: { size: 1 } } do
+    with_node node_type: 'call_node',
+              receiver: 'Rails.env',
+              name: '!=',
+              arguments: { node_type: 'arguments_node', arguments: { size: 1 } } do
       replace_with "!Rails.env.{{arguments.arguments.0.to_value}}?"
     end
 
     # 'development' != Rails.env
     # =>
     # !Rails.env.development?
-    with_node node_type: 'call_node', name: '!=', arguments: { node_type: 'arguments_node', arguments: { size: 1, first: 'Rails.env' } } do
+    with_node node_type: 'call_node',
+              name: '!=',
+              arguments: { node_type: 'arguments_node', arguments: { size: 1, first: 'Rails.env' } } do
       replace_with "!Rails.env.{{receiver.to_value}}?"
     end
   end

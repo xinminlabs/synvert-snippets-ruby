@@ -42,7 +42,21 @@ Synvert::Rewriter.new 'rails', 'test_request_methods_use_keyword_arguments' do
   within_files Synvert::RAILS_CONTROLLER_TEST_FILES + Synvert::RAILS_INTEGRATION_TEST_FILES do
     with_node node_type: 'call_node',
               name: { in: request_methods },
-              arguments: { node_type: 'arguments_node', arguments: { size: 2, '-1': { node_type: { in: %w[local_variable_read_node instance_variable_read_node call_node] } } } } do
+              arguments: {
+                node_type: 'arguments_node',
+                arguments: {
+                  size: 2,
+                  '-1': {
+                    node_type: {
+                      in: %w[
+                        local_variable_read_node
+                        instance_variable_read_node
+                        call_node
+                      ]
+                    }
+                  }
+                }
+              } do
       insert '**', to: 'arguments.arguments.-1', at: 'beginning'
     end
   end

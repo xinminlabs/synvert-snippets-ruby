@@ -29,19 +29,21 @@ RSpec.describe 'rails/parse helper', fakefs: true do
 
     rewriter.process
 
-    expect(rewriter.load_data(:rails_tables)).to eq({
-      "users" => {
-        columns: [
-          { name: "name", type: "string" },
-          { name: "email", type: "string" },
-          { name: "created_at", type: "datetime" },
-          { name: "updated_at", type: "datetime" }
-        ],
-        indices: [
-          { columns: ["email"], name: "index_users_on_email" }
-        ]
+    expect(rewriter.load_data(:rails_tables)).to eq(
+      {
+        "users" => {
+          columns: [
+            { name: "name", type: "string" },
+            { name: "email", type: "string" },
+            { name: "created_at", type: "datetime" },
+            { name: "updated_at", type: "datetime" }
+          ],
+          indices: [
+            { columns: ["email"], name: "index_users_on_email" }
+          ]
+        }
       }
-    })
+    )
   end
 
   it 'saves associations' do
@@ -65,10 +67,25 @@ RSpec.describe 'rails/parse helper', fakefs: true do
 
     rewriter.process
 
-    expect(rewriter.load_data(:rails_models)[:associations]).to eq([
-      { class_name: "Picture", name: "imageable", type: "belongs_to", polymorphic: true },
-      { class_name: "User", name: "organization", type: "belongs_to" },
-      { class_name: "User", name: "posts", type: "has_many" }
-    ])
+    expect(rewriter.load_data(:rails_models)[:associations]).to eq(
+      [
+        {
+          class_name: "Picture",
+          name: "imageable",
+          type: "belongs_to",
+          polymorphic: true
+        },
+        {
+          class_name: "User",
+          name: "organization",
+          type: "belongs_to"
+        },
+        {
+          class_name: "User",
+          name: "posts",
+          type: "has_many"
+        }
+      ]
+    )
   end
 end

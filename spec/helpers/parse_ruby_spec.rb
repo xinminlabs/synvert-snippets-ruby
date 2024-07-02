@@ -47,60 +47,62 @@ RSpec.describe 'ruby/parse helper', fakefs: true do
 
     rewriter.process
 
-    expect(rewriter.load_data(:ruby_definitions)).to eq({
-      classes: [],
-      modules: [
-        {
-          name: "Synvert",
-          full_name: "Synvert",
-          type: "module",
-          classes: [
-            {
-              name: "Admin",
-              full_name: "Synvert::Admin",
-              superclass: "User",
-              type: "class",
-              singleton: {},
-              classes: [],
-              constants: [],
-              modules: [],
-              methods: [{ name: "user_type" }],
-              static_methods: [],
-              constants: [],
-              included_modules: [],
-              ancestors: ["Synvert::User", "Trackable"]
-            },
-            {
-              name: "User",
-              full_name: "Synvert::User",
-              type: "class",
-              superclass: nil,
-              singleton: {
-                type: 'singleton',
+    expect(rewriter.load_data(:ruby_definitions)).to eq(
+      {
+        classes: [],
+        modules: [
+          {
+            name: "Synvert",
+            full_name: "Synvert",
+            type: "module",
+            classes: [
+              {
+                name: "Admin",
+                full_name: "Synvert::Admin",
+                superclass: "User",
+                type: "class",
+                singleton: {},
+                classes: [],
                 constants: [],
-                methods: [
-                  { name: 'system' },
-                  { name: 'bot' }
-                ]
+                modules: [],
+                methods: [{ name: "user_type" }],
+                static_methods: [],
+                constants: [],
+                included_modules: [],
+                ancestors: ["Synvert::User", "Trackable"]
               },
-              classes: [],
-              constants: [],
-              modules: [],
-              methods: [{ name: "user_type" }],
-              static_methods: [{ name: 'authenticate?' }],
-              constants: [{ name: "ROLES" }],
-              included_modules: ["Trackable"],
-              ancestors: ["Trackable"]
-            }
-          ],
-          modules: [],
-          methods: [],
-          singleton: {},
-          static_methods: [],
-          constants: []
-        }
-      ],
-      constants: []
-    })
+              {
+                name: "User",
+                full_name: "Synvert::User",
+                type: "class",
+                superclass: nil,
+                singleton: {
+                  type: 'singleton',
+                  constants: [],
+                  methods: [
+                    { name: 'system' },
+                    { name: 'bot' }
+                  ]
+                },
+                classes: [],
+                constants: [],
+                modules: [],
+                methods: [{ name: "user_type" }],
+                static_methods: [{ name: 'authenticate?' }],
+                constants: [{ name: "ROLES" }],
+                included_modules: ["Trackable"],
+                ancestors: ["Trackable"]
+              }
+            ],
+            modules: [],
+            methods: [],
+            singleton: {},
+            static_methods: [],
+            constants: []
+          }
+        ],
+        constants: []
+      }
+    )
   end
 end

@@ -65,7 +65,16 @@ Synvert::Rewriter.new 'rails', 'fix_model_3_2_deprecations' do
     # set_sequence_name = "seq" => self.sequence_name = "seq"
     # set_primary_key = "id" => self.primary_key = "id"
     # set_locking_column = "lock" => self.locking_column = "lock"
-    with_node node_type: 'call_node', name: { in: %w[set_table_name set_inheritance_column set_sequence_name set_primary_key set_locking_column] } do
+    with_node node_type: 'call_node',
+              name: {
+                in: %w[
+                  set_table_name
+                  set_inheritance_column
+                  set_sequence_name
+                  set_primary_key
+                  set_locking_column
+                ]
+              } do
       replace :message, with: "self.#{node.name.to_s.sub('set_', '')} ="
     end
   end

@@ -38,7 +38,9 @@ Synvert::Rewriter.new 'rspec', 'one_liner_expectation' do
     { should: 'to', should_not: 'not_to' }.each do |old_message, new_message|
       # it { should matcher } => it { is_expected.to matcher }
       # it { should_not matcher } => it { is_expected.not_to matcher }
-      with_node node_type: 'block', caller: { message: 'it' }, body: { size: 1, first: { node_type: 'send', receiver: nil, message: old_message } } do
+      with_node node_type: 'block',
+                caller: { message: 'it' },
+                body: { size: 1, first: { node_type: 'send', receiver: nil, message: old_message } } do
         receiver = node.body.first.arguments.first.receiver
         unless receiver && matcher_converters.include?(receiver.message)
           matcher = node.body.first.arguments.first.to_source
@@ -60,20 +62,23 @@ Synvert::Rewriter.new 'rspec', 'one_liner_expectation' do
       matcher_converters.each do |old_matcher, new_matcher|
         with_node node_type: 'block',
                   caller: { message: 'it' },
-                  body: { size: 1, first: {
-                    node_type: 'send',
-                    receiver: nil,
-                    message: old_message,
-                    arguments: {
-                      first: {
-                        node_type: 'send',
-                        receiver: {
+                  body: {
+                    size: 1,
+                    first: {
+                      node_type: 'send',
+                      receiver: nil,
+                      message: old_message,
+                      arguments: {
+                        first: {
                           node_type: 'send',
-                          message: old_matcher
+                          receiver: {
+                            node_type: 'send',
+                            message: old_matcher
+                          }
                         }
                       }
                     }
-                  } } do
+                  } do
           times = node.body.first.arguments.first.receiver.arguments.first.to_source
           items_name = node.body.first.arguments.first.message
           if :items == items_name

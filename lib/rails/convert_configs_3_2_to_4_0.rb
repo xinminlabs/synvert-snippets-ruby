@@ -102,7 +102,11 @@ Synvert::Rewriter.new 'rails', 'convert_configs_3_2_to_4_0' do
     end
 
     # remove config.middleware.xxx(..., ActionDispatch::BestStandardsSupport)
-    with_node node_type: 'call_node', arguments: { node_type: 'arguments_node', arguments: { includes: 'ActionDispatch::BestStandardsSupport' } } do
+    with_node node_type: 'call_node',
+              arguments: {
+                node_type: 'arguments_node',
+                arguments: { includes: 'ActionDispatch::BestStandardsSupport' }
+              } do
       remove
     end
 
@@ -153,9 +157,23 @@ Synvert::Rewriter.new 'rails', 'convert_configs_3_2_to_4_0' do
               receiver: 'ActiveSupport',
               name: 'on_load',
               arguments: { node_type: 'arguments_node', arguments: { size: 1, first: :active_record } },
-              block: { node_type: 'block_node', body: { node_type: 'statements_node', body: { size: 1, first: {
-                node_type: 'call_node', receiver: 'self', name: 'include_root_in_json=', arguments: { node_type: 'arguments_node', arguments: { size: 1, first: false } }
-              } } } } do
+              block: {
+                node_type: 'block_node',
+                body: {
+                  node_type: 'statements_node',
+                  body: {
+                    size: 1,
+                    first: {
+                      node_type: 'call_node',
+                      receiver: 'self',
+                      name: 'include_root_in_json=',
+                      arguments: {
+                        node_type: 'arguments_node', arguments: { size: 1, first: false }
+                      }
+                    }
+                  }
+                }
+              } do
       remove
     end
   end

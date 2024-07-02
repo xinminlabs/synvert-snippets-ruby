@@ -36,7 +36,10 @@ Synvert::Rewriter.new 'rails', 'convert_head_response' do
     with_node node_type: 'call_node',
               receiver: nil,
               name: 'render',
-              arguments: { node_type: 'arguments_node', arguments: { size: 1, first: { node_type: 'keyword_hash_node', nothing_value: true } } } do
+              arguments: {
+                node_type: 'arguments_node',
+                arguments: { size: 1, first: { node_type: 'keyword_hash_node', nothing_value: true } }
+              } do
       group do
         replace :message, with: 'head'
         if node.arguments.arguments.first.status_value.nil?
@@ -53,7 +56,13 @@ Synvert::Rewriter.new 'rails', 'convert_head_response' do
     with_node node_type: 'call_node',
               receiver: nil,
               name: 'head',
-              arguments: { node_type: 'arguments_node', arguments: { size: 1, first: { node_type: 'keyword_hash_node', location_value: { not: nil } } } } do
+              arguments: {
+                node_type: 'arguments_node',
+                arguments: {
+                  size: 1,
+                  first: { node_type: 'keyword_hash_node', location_value: { not: nil } }
+                }
+              } do
       replace 'arguments.arguments.0', with: ':ok, {{arguments.arguments.0.to_source}}'
     end
 
@@ -63,7 +72,13 @@ Synvert::Rewriter.new 'rails', 'convert_head_response' do
     with_node node_type: 'call_node',
               receiver: nil,
               name: 'head',
-              arguments: { node_type: 'arguments_node', arguments: { size: 1, first: { node_type: 'keyword_hash_node', status_value: { not: nil } } } } do
+              arguments: {
+                node_type: 'arguments_node',
+                arguments: {
+                  size: 1,
+                  first: { node_type: 'keyword_hash_node', status_value: { not: nil } }
+                }
+              } do
       replace 'arguments.arguments.0', with: '{{arguments.arguments.0.status_source}}'
     end
   end

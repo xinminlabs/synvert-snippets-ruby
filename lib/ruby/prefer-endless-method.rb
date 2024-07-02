@@ -24,7 +24,8 @@ Synvert::Rewriter.new 'ruby', 'prefer-endless-method' do
   within_files Synvert::ALL_RUBY_FILES + Synvert::ALL_RAKE_FILES do
     find_node '.def_node[body!=nil][body.body.length=1]' do
       body_column = mutation_adapter.get_start_loc(node.body.body.first).column
-      new_body = node.body.body.first.to_source.split("\n").map { |line| line.sub(/^ {#{body_column}}/, '') }.join("\n")
+      new_body = node.body.body.first.to_source.split("\n").map { |line| line.sub(/^ {#{body_column}}/, '') }
+                     .join("\n")
       replace_with "def {{name}}{{lparen}}{{parameters}}{{rparen}} = #{new_body}"
     end
   end

@@ -221,7 +221,10 @@ Synvert::Rewriter.new 'rails', 'convert_models_2_3_to_3_0' do
                 arguments: {
                   node_type: 'arguments_node',
                   arguments: {
-                    last: { node_type: 'call_node', block: { node_type: 'block_node', body: { body: { first: { node_type: 'hash_node' } } } } }
+                    last: {
+                      node_type: 'call_node',
+                      block: { node_type: 'block_node', body: { body: { first: { node_type: 'hash_node' } } } }
+                    }
                   }
                 } do
       goto_node 'arguments.arguments.-1.block.body.body.0' do
@@ -241,7 +244,12 @@ Synvert::Rewriter.new 'rails', 'convert_models_2_3_to_3_0' do
     # scoped(:conditions => {:active => true})
     # =>
     # where(:active => true)
-    within_node node_type: 'call_node', name: 'scoped', arguments: { node_type: 'arguments_node', arguments: { size: 1, first: { node_type: 'keyword_hash_node' } } } do
+    within_node node_type: 'call_node',
+                name: 'scoped',
+                arguments: {
+                  node_type: 'arguments_node',
+                  arguments: { size: 1, first: { node_type: 'keyword_hash_node' } }
+                } do
       if keys & node.arguments.arguments.first.keys.map(&:to_value)
         replace :message, :closing, with: generate_new_queries(node.arguments.arguments.first)
       end
@@ -252,7 +260,10 @@ Synvert::Rewriter.new 'rails', 'convert_models_2_3_to_3_0' do
     # Post.joins(:comments).all
     within_node node_type: 'call_node',
                 name: 'all',
-                arguments: { node_type: 'arguments_node', arguments: { size: 1, first: { node_type: 'keyword_hash_node' } } } do
+                arguments: {
+                  node_type: 'arguments_node',
+                  arguments: { size: 1, first: { node_type: 'keyword_hash_node' } }
+                } do
       if keys & node.arguments.arguments.first.keys.map(&:to_value)
         replace :message, :closing, with: "#{generate_new_queries(node.arguments.arguments.first)}"
       end
@@ -263,7 +274,10 @@ Synvert::Rewriter.new 'rails', 'convert_models_2_3_to_3_0' do
     # Post.where(:title => "test").first
     within_node node_type: 'call_node',
                 name: { in: ['first', 'last'] },
-                arguments: { node_type: 'arguments_node', arguments: { size: 1, first: { node_type: 'keyword_hash_node' } } } do
+                arguments: {
+                  node_type: 'arguments_node',
+                  arguments: { size: 1, first: { node_type: 'keyword_hash_node' } }
+                } do
       if keys & node.arguments.arguments.first.keys.map(&:to_value)
         replace :message, :closing, with: "#{generate_new_queries(node.arguments.arguments.first)}.{{name}}"
       end
@@ -282,7 +296,10 @@ Synvert::Rewriter.new 'rails', 'convert_models_2_3_to_3_0' do
     # Client.where(:active => true).sum("orders_count")
     within_node node_type: 'call_node',
                 name: { in: %w[count average min max sum] },
-                arguments: { node_type: 'arguments_node', arguments: { size: 2, last: { node_type: 'keyword_hash_node' } } } do
+                arguments: {
+                  node_type: 'arguments_node',
+                  arguments: { size: 2, last: { node_type: 'keyword_hash_node' } }
+                } do
       if keys & node.arguments.arguments.last.keys.map(&:to_value)
         group do
           insert ".#{generate_new_queries(node.arguments.arguments.last)}", to: 'receiver', at: 'end'
@@ -296,7 +313,10 @@ Synvert::Rewriter.new 'rails', 'convert_models_2_3_to_3_0' do
     # Post.limit(2)
     with_node node_type: 'call_node',
               name: 'find',
-              arguments: { node_type: 'arguments_node', arguments: { size: 2, first: :all, last: { node_type: 'keyword_hash_node' } } } do
+              arguments: {
+                node_type: 'arguments_node',
+                arguments: { size: 2, first: :all, last: { node_type: 'keyword_hash_node' } }
+              } do
       if keys & node.arguments.arguments.last.keys.map(&:to_value)
         replace :message, :closing, with: generate_new_queries(node.arguments.arguments.last)
       end
@@ -305,7 +325,9 @@ Synvert::Rewriter.new 'rails', 'convert_models_2_3_to_3_0' do
     # Post.find(:all)
     # =>
     # Post.all
-    with_node node_type: 'call_node', name: 'find', arguments: { node_type: 'arguments_node', arguments: { size: 1, first: :all } } do
+    with_node node_type: 'call_node',
+              name: 'find',
+              arguments: { node_type: 'arguments_node', arguments: { size: 1, first: :all } } do
       group do
         replace :message, with: 'all'
         delete :opening, :closing
@@ -317,9 +339,18 @@ Synvert::Rewriter.new 'rails', 'convert_models_2_3_to_3_0' do
     # Post.where(:title => "title").last
     within_node node_type: 'call_node',
                 name: 'find',
-                arguments: { node_type: 'arguments_node', arguments: { size: 2, first: { in: [:first, :last] }, last: { node_type: 'keyword_hash_node' } } } do
+                arguments: {
+                  node_type: 'arguments_node',
+                  arguments: {
+                    size: 2,
+                    first: { in: [:first, :last] },
+                    last: { node_type: 'keyword_hash_node' }
+                  }
+                } do
       if keys & node.arguments.arguments.last.keys.map(&:to_value)
-        replace :message, :closing, with: "#{generate_new_queries(node.arguments.arguments.last)}.{{arguments.arguments.first.to_value}}"
+        replace :message,
+                :closing,
+                with: "#{generate_new_queries(node.arguments.arguments.last)}.{{arguments.arguments.first.to_value}}"
       end
     end
 
@@ -339,7 +370,9 @@ Synvert::Rewriter.new 'rails', 'convert_models_2_3_to_3_0' do
     # Post.where(:title => "test").update_all(:title => "title")
     # Post.where("title = \'test\'").update_all("title = \'title\'")
     # Post.where("title = ?", title).update_all("title = \'title\'")
-    within_node node_type: 'call_node', name: :update_all, arguments: { node_type: 'arguments_node', arguments: { size: 2 } } do
+    within_node node_type: 'call_node',
+                name: :update_all,
+                arguments: { node_type: 'arguments_node', arguments: { size: 2 } } do
       group do
         insert '.where({{arguments.arguments.first}})', to: 'receiver', at: 'end'
         delete 'arguments.arguments.first', and_comma: true
@@ -349,7 +382,9 @@ Synvert::Rewriter.new 'rails', 'convert_models_2_3_to_3_0' do
     # Post.update_all({:title => "title"}, {:title => "test"}, {:limit => 2})
     # =>
     # Post.where(:title => "test").limit(2).update_all(:title => "title")
-    within_node node_type: 'call_node', name: :update_all, arguments: { node_type: 'arguments_node', arguments: { size: 3 } } do
+    within_node node_type: 'call_node',
+                name: :update_all,
+                arguments: { node_type: 'arguments_node', arguments: { size: 3 } } do
       group do
         insert '.where({{arguments.arguments.first}})', to: 'receiver', at: 'end'
         insert ".#{generate_new_queries(node.arguments.arguments.last)}", to: 'receiver', at: 'end'
@@ -369,7 +404,9 @@ Synvert::Rewriter.new 'rails', 'convert_models_2_3_to_3_0' do
     # =>
     # Post.where("title = \'test\'").destroy_all
     # Post.where("title = ?", title).destroy_all
-    within_node node_type: 'call_node', name: { in: ['delete_all', 'destroy_all'] }, arguments: { node_type: 'arguments_node', arguments: { size: 1 } } do
+    within_node node_type: 'call_node',
+                name: { in: ['delete_all', 'destroy_all'] },
+                arguments: { node_type: 'arguments_node', arguments: { size: 1 } } do
       group do
         replace :message, with: 'where'
         insert ".{{message}}"
@@ -389,7 +426,10 @@ Synvert::Rewriter.new 'rails', 'convert_models_2_3_to_3_0' do
     # end
     within_node node_type: 'call_node',
                 name: { in: ['find_each', 'find_in_batches'] },
-                arguments: { node_type: 'arguments_node', arguments: { size: 1, first: { node_type: 'keyword_hash_node' } } } do
+                arguments: {
+                  node_type: 'arguments_node',
+                  arguments: { size: 1, first: { node_type: 'keyword_hash_node' } }
+                } do
       argument_node = node.arguments.arguments.first
       if keys & argument_node.keys.map(&:to_value)
         batch_options = generate_batch_options(argument_node)
@@ -410,7 +450,13 @@ Synvert::Rewriter.new 'rails', 'convert_models_2_3_to_3_0' do
     # with_exclusive_scope(limit(1)) { Post.last }
     within_node node_type: 'call_node',
                 name: { in: ['with_scope', 'with_exclusive_scope'] },
-                arguments: { node_type: 'arguments_node', arguments: { size: 1, first: { node_type: 'keyword_hash_node', find_value: { not: nil } } } } do
+                arguments: {
+                  node_type: 'arguments_node',
+                  arguments: {
+                    size: 1,
+                    first: { node_type: 'keyword_hash_node', find_value: { not: nil } }
+                  }
+                } do
       replace :arguments, with: generate_new_queries(node.arguments.arguments.first.find_value.to_value)
     end
   end

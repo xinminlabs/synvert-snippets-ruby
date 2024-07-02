@@ -33,7 +33,9 @@ Synvert::Rewriter.new 'rails', 'convert_views_3_2_to_4_0' do
                 } do
       group do
         delete 'arguments.arguments.last.confirm_element', and_comma: true
-        insert 'data: { confirm: {{arguments.arguments.last.confirm_value}} }', to: 'arguments.arguments.last', and_comma: true
+        insert 'data: { confirm: {{arguments.arguments.last.confirm_value}} }',
+               to: 'arguments.arguments.last',
+               and_comma: true
       end
     end
 
@@ -47,7 +49,9 @@ Synvert::Rewriter.new 'rails', 'convert_views_3_2_to_4_0' do
                 } do
       group do
         delete 'arguments.arguments.last.confirm_element', and_comma: true
-        insert '{{arguments.arguments.last.confirm_element}}', to: 'arguments.arguments.last.data_element.value.elements', and_comma: true
+        insert '{{arguments.arguments.last.confirm_element}}',
+               to: 'arguments.arguments.last.data_element.value.elements',
+               and_comma: true
       end
     end
   end

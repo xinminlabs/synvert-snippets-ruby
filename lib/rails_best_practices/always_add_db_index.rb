@@ -23,24 +23,29 @@ Synvert::Rewriter.new 'rails_best_practices', 'always_add_db_index' do
 
   within_files 'db/schema.rb' do
     rails_tables.each do |table_name, table_info|
-      belongs_to_associations = rails_models[:associations].select do |association|
-        # find all belongs_to associations
-        association[:class_name].tableize == table_name && association[:type] == 'belongs_to'
-      end
-      polymorphic_belongs_to_associations = belongs_to_associations.select do |association|
-        next false unless association[:polymorphic]
+      belongs_to_associations =
+        rails_models[:associations].select do |association|
+          # find all belongs_to associations
+          association[:class_name].tableize == table_name && association[:type] == 'belongs_to'
+        end
+      polymorphic_belongs_to_associations =
+        belongs_to_associations.select do |association|
+          next false unless association[:polymorphic]
 
-        # find all belongs_to associations without db index
-        table_info[:columns].find { |column| column[:name] == foreign_key_column(association) } &&
-        table_info[:columns].find { |column| column[:name] == foreign_type_column(association) } &&
-        !table_info[:indices].find { |index| index[:columns].first == foreign_type_column(association) && index[:columns].second == foreign_key_column(association) }
-      end
-      general_belongs_to_associations = belongs_to_associations.select do |association|
-        !association[:polymorphic] &&
-        # find all belongs_to associations without db index
-        table_info[:columns].find { |column| column[:name] == foreign_key_column(association) } &&
-        !table_info[:indices].find { |index| index[:columns].first == foreign_key_column(association) }
-      end
+          # find all belongs_to associations without db index
+          table_info[:columns].find { |column| column[:name] == foreign_key_column(association) } &&
+            table_info[:columns].find { |column| column[:name] == foreign_type_column(association) } &&
+            !table_info[:indices].find { |index|
+              index[:columns].first == foreign_type_column(association) && index[:columns].second == foreign_key_column(association)
+            }
+        end
+      general_belongs_to_associations =
+        belongs_to_associations.select do |association|
+          !association[:polymorphic] &&
+            # find all belongs_to associations without db index
+            table_info[:columns].find { |column| column[:name] == foreign_key_column(association) } &&
+            !table_info[:indices].find { |index| index[:columns].first == foreign_key_column(association) }
+        end
 
       polymorphic_belongs_to_associations.each do |association|
         find_node ".call_node[receiver=nil][name=create_table][arguments!=nil][arguments.arguments.first='#{table_name}']

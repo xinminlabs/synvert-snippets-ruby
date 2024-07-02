@@ -40,7 +40,10 @@ Synvert::Rewriter.new 'rails', 'convert_test_request_methods_4_2_to_5_0' do
 
     if argument_node.type == :keyword_hash_node || argument_node.type == :hash_node
       new_value =
-        argument_node.elements.reject { |element_node| element_node.type == :assoc_node && %i[format xhr as].include?(element_node.key.to_value) }.map(&:to_source).join(', ')
+        argument_node.elements.reject { |element_node|
+          element_node.type == :assoc_node && %i[format xhr as].include?(element_node.key.to_value)
+        }
+.map(&:to_source).join(', ')
       "#{key}: #{add_curly_brackets_if_necessary(new_value)}" if new_value.length > 0
     else
       "#{key}: #{argument_node.to_source}"
@@ -79,7 +82,9 @@ Synvert::Rewriter.new 'rails', 'convert_test_request_methods_4_2_to_5_0' do
       replace :arguments, with: '{{arguments.arguments.1}}, xhr: true'
     end
 
-    with_node node_type: 'call_node', name: 'xhr', arguments: { node_type: 'arguments_node', arguments: { size: { gt: 2 } } } do
+    with_node node_type: 'call_node',
+              name: 'xhr',
+              arguments: { node_type: 'arguments_node', arguments: { size: { gt: 2 } } } do
       format_value = node.arguments.arguments[2].type == :hash && node.arguments.arguments[2].format_value
       options = []
       options << make_up_hash_element('params', node.arguments.arguments[2])

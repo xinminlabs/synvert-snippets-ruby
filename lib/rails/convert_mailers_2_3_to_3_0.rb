@@ -79,7 +79,10 @@ Synvert::Rewriter.new 'rails', 'convert_mailers_2_3_to_3_0' do
       class_name = node.name
       within_node node_type: 'def_node' do
         args = {}
-        with_node node_type: 'call_node', receiver: nil, name: 'recipients', arguments: { node_type: 'arguments_node', arguments: { size: 1 } } do
+        with_node node_type: 'call_node',
+                  receiver: nil,
+                  name: 'recipients',
+                  arguments: { node_type: 'arguments_node', arguments: { size: 1 } } do
           args[:to] = node.arguments.arguments.first.to_source
           remove
         end
@@ -97,13 +100,20 @@ Synvert::Rewriter.new 'rails', 'convert_mailers_2_3_to_3_0' do
         with_node node_type: 'call_node',
                   receiver: nil,
                   name: 'body',
-                  arguments: { node_type: 'arguments_node', arguments: { size: 1, first: { node_type: 'keyword_hash_node' } } } do
-          replace_with node.arguments.arguments.first.elements.map { |element| "@#{element.key.to_value} = #{element.value.to_source}" }.join("\n")
+                  arguments: {
+                    node_type: 'arguments_node',
+                    arguments: { size: 1, first: { node_type: 'keyword_hash_node' } }
+                  } do
+          replace_with node.arguments.arguments.first.elements.map { |element|
+                         "@#{element.key.to_value} = #{element.value.to_source}"
+                       }
+.join("\n")
         end
         if args.size > 0
           mailer_methods[class_name] ||= []
           mailer_methods[class_name] << node.name
-          args_str = args.map { |key, value| ":#{key} => #{value}" }.join(', ')
+          args_str = args.map { |key, value| ":#{key} => #{value}" }
+                         .join(', ')
           append "mail(#{args_str})"
         end
       end
@@ -134,7 +144,10 @@ Synvert::Rewriter.new 'rails', 'convert_mailers_2_3_to_3_0' do
     # Notifier.deliver(message)
     # =>
     # message.deliver
-    with_node node_type: 'call_node', receiver: { not: nil }, name: 'deliver', arguments: { node_type: 'arguments_node', arguments: { size: 1 } } do
+    with_node node_type: 'call_node',
+              receiver: { not: nil },
+              name: 'deliver',
+              arguments: { node_type: 'arguments_node', arguments: { size: 1 } } do
       if mailer_methods[node.receiver.name]
         replace_with '{{arguments}}.{{message}}'
       end

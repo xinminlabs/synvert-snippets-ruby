@@ -66,7 +66,8 @@ Synvert::Rewriter.new 'rails', 'convert_model_lambda_scope' do
                 }
               } do
       if node.arguments.arguments.last.block.parameters
-        replace 'arguments.arguments.last', with: '->({{arguments.arguments.last.block.parameters.parameters}}) { {{arguments.arguments.last.block.body}} }'
+        replace 'arguments.arguments.last',
+                with: '->({{arguments.arguments.last.block.parameters.parameters}}) { {{arguments.arguments.last.block.body}} }'
       else
         replace 'arguments.arguments.last', with: '-> { {{arguments.arguments.last.block.body}} }'
       end
@@ -87,7 +88,8 @@ Synvert::Rewriter.new 'rails', 'convert_model_lambda_scope' do
                 }
               } do
       if node.arguments.arguments.last.block.parameters
-        replace 'arguments.arguments.last', with: '->({{arguments.arguments.last.block.parameters.parameters}}) { {{arguments.arguments.last.block.body}} }'
+        replace 'arguments.arguments.last',
+                with: '->({{arguments.arguments.last.block.parameters.parameters}}) { {{arguments.arguments.last.block.body}} }'
       else
         replace 'arguments.arguments.last', with: '-> { {{arguments.arguments.last.block.body}} }'
       end
@@ -102,10 +104,7 @@ Synvert::Rewriter.new 'rails', 'convert_model_lambda_scope' do
     end
 
     # default_scope { order("updated_at DESC") } => default_scope -> { order("updated_at DESC") }
-    with_node node_type: 'call_node',
-              receiver: nil,
-              name: 'default_scope',
-              block: { node_type: 'block_node' } do
+    with_node node_type: 'call_node', receiver: nil, name: 'default_scope', block: { node_type: 'block_node' } do
       replace_with 'default_scope -> { {{block.body.body}} }'
     end
   end

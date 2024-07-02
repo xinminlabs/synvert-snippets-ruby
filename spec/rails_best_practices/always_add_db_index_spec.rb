@@ -50,10 +50,12 @@ RSpec.describe 'Rails Best Practices always add db index' do
         belongs_to :user
       end
     EOF
-    let(:warnings) { [
-      '/db/schema.rb#6: always add db index comments => ["post_id"]',
-      '/db/schema.rb#7: always add db index comments => ["user_id"]'
-    ] }
+    let(:warnings) {
+      [
+        '/db/schema.rb#6: always add db index comments => ["post_id"]',
+        '/db/schema.rb#7: always add db index comments => ["user_id"]'
+      ]
+    }
 
     include_examples 'warnable'
   end

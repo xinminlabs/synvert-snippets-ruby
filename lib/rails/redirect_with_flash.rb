@@ -37,7 +37,10 @@ Synvert::Rewriter.new 'rails', 'redirect_with_flash' do
       msg = nil
       remover_action = nil
       flash_type = nil
-      with_node node_type: 'call_node', receiver: 'flash', name: '[]=', arguments: { node_type: 'arguments_node', arguments: { size: 2 } } do
+      with_node node_type: 'call_node',
+                receiver: 'flash',
+                name: '[]=',
+                arguments: { node_type: 'arguments_node', arguments: { size: 2 } } do
         line = mutation_adapter.get_start_loc(node).line
         flash_type = node.arguments.arguments.first.to_source
         msg = node.arguments.arguments.last.to_source
